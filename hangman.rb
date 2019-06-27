@@ -18,7 +18,8 @@ end
 
 class Game
   attr_accessor :display, :file, :player, :incorrect_letters,
-                :word_to_guess, :correct_letters, :guesses
+                :word_to_guess, :correct_letters, :guesses,
+                :currently_guessed
 
   def initialize
     @display = Display.new
@@ -28,6 +29,7 @@ class Game
     @player = Player.new
     @word_to_guess = "hello"
     @guesses = 6
+    @currently_guessed
   end
 
   def dictionary
@@ -40,12 +42,51 @@ class Game
       display_word
       puts "Enter a letter"
       answer = gets.chomp.downcase
-      if word_to_guess.include?(answer)
-        add_correct_letters(answer)
+      validated, error_message = validate_answer(answer)
+      (puts error_message; redo) unless validated
+      if answer.size >= 5
+        check_word(answer)
       else
-        add_incorrect_letters(answer)
+        check_letter(answer)
       end
+      self.currently_guessed = letters_to_display.join
+      (win; break) if check_win
+      (lose; break) if check_loss
       display_incorrect_letters
+      p guesses
+    end
+  end
+
+  def validate_answer(answer)
+    case
+    when answer.size > 1 && answer.size < 5
+      [false, "If you're guessing the whole word it needs to be at least 5 letters. Or else just enter 1 letter."]
+    when answer.size > 5 && answer.size != word_to_guess.size
+      [false, "Your guess would need to be the same length as the word."]
+    when !answer.match?(/\A[a-z]+\z/) 
+      [false, "Guess must contain only letters and can't be blank."]
+    else
+      [true]
+    end
+  end
+
+  def check_letter(letter)
+    puts "checking letter"
+    if word_to_guess.include?(letter)
+      add_correct_letters(letter)
+    else
+      add_incorrect_letters(letter)
+      self.guesses -= 1
+    end
+  end
+
+  def check_word(word)
+    puts "checking word"
+    if word_to_guess == word
+      puts "you win"
+    else
+      puts "wrong bitch"
+      self.guesses -= 1
     end
   end
 
@@ -70,13 +111,29 @@ class Game
   end
 
   def display_incorrect_letters
-    p incorrect_letters
+    puts "Wrong guessed letters: #{incorrect_letters.join(',')}"
   end
 
   def letters_to_display
     word_to_guess.chars.map do |letter|
       correct_letters.include?(letter) ? letter : "_"
     end
+  end
+
+  def check_win
+    currently_guessed == word_to_guess
+  end
+
+  def check_loss
+    guesses < 1
+  end
+
+  def win
+    puts "You win"
+  end
+
+  def lose
+    puts "You lose"
   end
 
 end
