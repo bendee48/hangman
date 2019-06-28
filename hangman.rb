@@ -78,9 +78,8 @@ class Game
       self.currently_guessed = letters_to_display.join
       (win; break) if check_win
       (lose; break) if check_loss
-      display_incorrect_letters
       display.show_gallows
-      p guesses
+      display_incorrect_letters
     end
   end
 
@@ -96,10 +95,11 @@ class Game
   end
 
   def check_letter(letter)
-    puts "checking letter"
     if word_to_guess.include?(letter)
+      puts "Yes, '#{letter}' is correct!"
       add_correct_letters(letter)
     else
+      puts "Sorry, there's no '#{letter}'."
       add_incorrect_letters(letter)
       self.guesses -= 1
       display.add_to_gallows(self.guesses)
@@ -107,12 +107,11 @@ class Game
   end
 
   def check_word(word)
-    puts "checking word"
     if word_to_guess == word
       win
       true
     else
-      puts "wrong bitch"
+      puts "Sorry, that's not the word we're looking for."
       self.guesses -= 1
       display.add_to_gallows(self.guesses)
       nil
@@ -136,7 +135,9 @@ class Game
   end
 
   def display_word
+    puts 
     puts (" %s" * word_to_guess.size).chomp % letters_to_display
+    puts
   end
 
   def display_incorrect_letters
@@ -158,11 +159,13 @@ class Game
   end
 
   def win
-    puts "You win"
+    word = word_to_guess.upcase.chars.join(" ")
+    puts "Yaaasss! It was #{word}. You win!"
   end
 
   def lose
-    puts "You lose"
+    puts "You lose. Game Over."
+    display.show_gallows
   end
 
 end
