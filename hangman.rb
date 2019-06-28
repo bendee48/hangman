@@ -7,13 +7,39 @@ class Player
 end
 
 class Display
+  attr_accessor :head, :body, :legs
+
+  def initialize
+    @head = "   |    "
+    @body = "   |    "
+    @legs = "   |    "
+  end
+
   def show_gallows
     puts "  ________"
     puts "   |/   |"
-    puts ["   |    ", "   |    ", "   |   "]
+    puts head, body, legs 
     puts "   |"
     puts " ==========="
   end
+
+  def add_to_gallows(tries)
+    case tries
+    when 5
+      head << "O"
+    when 4
+      body << "|"
+    when 3
+      body[7] = "/"
+    when 2
+      body[9] = "\\"
+    when 1
+      legs[7] = "/"
+    when 0
+      legs << " \\"
+    end
+  end
+
 end
 
 class Game
@@ -44,8 +70,8 @@ class Game
       answer = gets.chomp.downcase
       validated, error_message = validate_answer(answer)
       (puts error_message; redo) unless validated
-      if answer.size >= 5
-        check_word(answer)
+      if answer.size == word_to_guess.size
+        break if check_word(answer)
       else
         check_letter(answer)
       end
@@ -53,16 +79,15 @@ class Game
       (win; break) if check_win
       (lose; break) if check_loss
       display_incorrect_letters
+      display.show_gallows
       p guesses
     end
   end
 
   def validate_answer(answer)
     case
-    when answer.size > 1 && answer.size < 5
-      [false, "If you're guessing the whole word it needs to be at least 5 letters. Or else just enter 1 letter."]
-    when answer.size > 5 && answer.size != word_to_guess.size
-      [false, "Your guess would need to be the same length as the word."]
+    when answer.size > 1 && answer.size != word_to_guess.size
+      [false, "If you're guessing the whole word it needs to be the same length as the hidden word. Or else, please just enter 1 letter."]
     when !answer.match?(/\A[a-z]+\z/) 
       [false, "Guess must contain only letters and can't be blank."]
     else
@@ -77,16 +102,20 @@ class Game
     else
       add_incorrect_letters(letter)
       self.guesses -= 1
+      display.add_to_gallows(self.guesses)
     end
   end
 
   def check_word(word)
     puts "checking word"
     if word_to_guess == word
-      puts "you win"
+      win
+      true
     else
       puts "wrong bitch"
       self.guesses -= 1
+      display.add_to_gallows(self.guesses)
+      nil
     end
   end
 
@@ -138,5 +167,5 @@ class Game
 
 end
 
-p hey = Game.new
+hey = Game.new
 hey.game_start
