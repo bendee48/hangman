@@ -19,8 +19,27 @@ include Textable
     @loaded_game = false
   end
   
-  def dictionary
-    File.open('./5desk.txt') { |file| file.read }.split
+
+  def self.load_game(file)
+    file = File.open(file) { |f| f.read }
+    game = YAML.load(file)
+    game.loaded_game = true
+    game.main_game_loop
+  end
+
+  def self.launch
+    puts "Welcome to Hangman."
+    loop do
+      puts "Enter (1) to Start a new game or (2) to load your previous game."
+      answer = gets.chomp
+      if answer == "1"
+        Game.new.start; break
+      elsif answer == "2"
+        Game.load_game('save_game.yaml'); break
+      else
+        puts "I didn't recognise that."
+      end
+    end
   end
 
   def start
@@ -30,13 +49,6 @@ include Textable
 
   def save_game
     File.open('save_game.yaml', 'w') { |f| f.puts YAML.dump(self) }
-  end
-
-  def self.load_game(file)
-    file = File.open(file) { |f| f.read }
-    game = YAML.load(file)
-    game.loaded_game = true
-    game.main_game_loop
   end
 
   def main_game_loop
@@ -62,6 +74,8 @@ include Textable
     display_word
     display_incorrect_letters
   end
+
+  private
 
   def validate_answer(answer)
     case
@@ -106,6 +120,10 @@ include Textable
 
   def add_incorrect_letters(letter)
     incorrect_letters << letter if !incorrect_letters.include?(letter)
+  end
+
+  def dictionary
+    File.open('./5desk.txt') { |file| file.read }.split
   end
 
   def random_word

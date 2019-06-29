@@ -1,14 +1,21 @@
 --- !ruby/object:Game
 display: !ruby/object:Display
   head: "   |    O"
-  body: "   |    "
-  legs: "   |    "
+  body: "   |   /|\\"
+  legs: "   |   /"
 incorrect_letters:
-- w
-correct_letters: []
+- t
+- h
+- y
+- u
+- k
+correct_letters:
+- e
+- r
+- i
 player: !ruby/object:Player
-  name: Loop
-word_to_guess: Cambria
-guesses: 5
+  name: Emma
+word_to_guess: screwiness
+guesses: 1
 loaded_game: false
-currently_guessed: _______
+currently_guessed: __re_i_e__
