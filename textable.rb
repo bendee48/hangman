@@ -1,7 +1,6 @@
 module Textable
 
   def introduction
-    puts "Welcome to Hangman."
     puts "Enter 'i' for instructions or press Return to get started."
     answer = gets.chomp.downcase
     instructions if answer == 'i'

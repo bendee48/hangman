@@ -1,10 +1,10 @@
 class Display
   attr_accessor :head, :body, :legs
 
-  def initialize
-    @head = "   |    "
-    @body = "   |    "
-    @legs = "   |    "
+  def initialize(head="   |    ", body="   |    ", legs="   |    ")
+    @head = head
+    @body = body
+    @legs = legs
   end
 
   def show_gallows

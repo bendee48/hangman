@@ -1,0 +1,14 @@
+--- !ruby/object:Game
+display: !ruby/object:Display
+  head: "   |    O"
+  body: "   |    "
+  legs: "   |    "
+incorrect_letters:
+- w
+correct_letters: []
+player: !ruby/object:Player
+  name: Loop
+word_to_guess: Cambria
+guesses: 5
+loaded_game: false
+currently_guessed: _______

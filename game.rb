@@ -1,25 +1,26 @@
 require './textable'
+require 'yaml'
 
 class Game
 include Textable
   
   attr_accessor :display, :player, :incorrect_letters,
                 :word_to_guess, :correct_letters, :guesses,
-                :currently_guessed
+                :currently_guessed, :loaded_game
 
   def initialize
     @display = Display.new
     @incorrect_letters = []
     @correct_letters = []
-    @dictionary = File.open('./5desk.txt') { |file| file.read }
     @player = Player.new
     @word_to_guess = random_word
     @guesses = 6
     @currently_guessed
+    @loaded_game = false
   end
-
+  
   def dictionary
-    @dictionary.split
+    File.open('./5desk.txt') { |file| file.read }.split
   end
 
   def start
@@ -27,28 +28,45 @@ include Textable
     main_game_loop
   end
 
+  def save_game
+    File.open('save_game.yaml', 'w') { |f| f.puts YAML.dump(self) }
+  end
+
+  def self.load_game(file)
+    file = File.open(file) { |f| f.read }
+    game = YAML.load(file)
+    game.loaded_game = true
+    game.main_game_loop
+  end
+
   def main_game_loop
     loop do
-      display_word
-      puts "Enter a letter"
+      game_opening
+      puts "\nEnter a letter"
       answer = gets.chomp.downcase
       validated, error_message = validate_answer(answer)
+      break if validated == "quit"
       (puts error_message; redo) unless validated
-      if answer.size == word_to_guess.size
-        break if check_word(answer)
-      else
-        check_letter(answer)
-      end
+      answer.size == word_to_guess.size ? (break if check_word(answer)) : check_letter(answer)
       self.currently_guessed = letters_to_display.join
-      (win; break) if check_win
-      (lose; break) if check_loss
+      (win; break) if has_won
+      (lose; break) if has_lost
       display.show_gallows
-      display_incorrect_letters
+      save_game
     end
+  end
+
+  def game_opening
+    puts "Welcome back #{player.name}." if loaded_game
+    self.loaded_game = false
+    display_word
+    display_incorrect_letters
   end
 
   def validate_answer(answer)
     case
+    when answer == "quit"
+      ["quit"]
     when answer.size > 1 && answer.size != word_to_guess.size
       [false, "If you're guessing the whole word it needs to be the same length as the hidden word. Or else, please just enter 1 letter."]
     when !answer.match?(/\A[a-z]+\z/) 
@@ -114,11 +132,11 @@ include Textable
     end
   end
 
-  def check_win
+  def has_won
     currently_guessed == word_to_guess
   end
 
-  def check_loss
+  def has_lost
     guesses < 1
   end
 
