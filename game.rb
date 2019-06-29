@@ -21,10 +21,15 @@ include Textable
   
 
   def self.load_game(file)
-    file = File.open(file) { |f| f.read }
-    game = YAML.load(file)
-    game.loaded_game = true
-    game.main_game_loop
+    begin
+      file = File.open(file) { |f| f.read }
+      game = YAML.load(file)
+      game.loaded_game = true
+      game.main_game_loop
+    rescue
+      puts "No current save game."
+      self.launch
+    end
   end
 
   def self.launch

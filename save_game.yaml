@@ -4,18 +4,17 @@ display: !ruby/object:Display
   body: "   |   /|\\"
   legs: "   |   /"
 incorrect_letters:
-- t
+- w
+- f
 - h
-- y
-- u
-- k
+- d
 correct_letters:
 - e
-- r
-- i
+- g
+- y
 player: !ruby/object:Player
-  name: Emma
-word_to_guess: screwiness
+  name: Ben
+word_to_guess: cogency
 guesses: 1
 loaded_game: false
-currently_guessed: __re_i_e__
+currently_guessed: __ge__y
